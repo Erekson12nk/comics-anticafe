@@ -151,3 +151,7 @@ table.table td, table.table th { vertical-align: middle; border-color: var(--ink
   border-top: 6px solid var(--yellow); font-family: var(--font-hand); font-size: 1.05rem; }
 .price-box { display: inline-block; font-family: var(--font-head); background: var(--yellow); border: var(--line) solid var(--ink);
   box-shadow: var(--shadow); padding: .4rem .9rem; transform: rotate(-2deg); }
+
+/* Полоса демо-версии (статичная сборка для GitHub Pages) */
+.demo-bar { background: var(--blue); color: #fff; text-align: center; font-weight: 700; padding: .45rem 1rem;
+  border-bottom: var(--line) solid var(--ink); }

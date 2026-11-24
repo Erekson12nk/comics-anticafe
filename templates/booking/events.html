@@ -25,6 +25,7 @@
             {% if user in e.participants.all %}<button class="btn btn-sm btn-outline-secondary">Отписаться</button>
             {% else %}<button class="btn btn-sm btn-primary" {% if not e.free_seats %}disabled{% endif %}>Записаться</button>{% endif %}
           </form>
+        {% elif DEMO %}<span class="btn btn-sm btn-light disabled">Работает в полной версии сайта</span>
         {% else %}<a class="btn btn-sm btn-primary" href="{% url 'accounts:login' %}">Войти и записаться</a>{% endif %}
       </div>
     </div>

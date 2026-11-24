@@ -2,6 +2,7 @@
 {% block title %}Настольные игры{% endblock %}
 {% block content %}
 <h1 class="page-title">Каталог настольных игр</h1>
+{% if not DEMO %}
 <form class="card p-3 mb-4 row g-2 flex-row align-items-center" method="get">
   <div class="col-md-4"><input class="form-control" name="q" value="{{ q }}" placeholder="Поиск по названию или описанию"></div>
   <div class="col-md-2"><select class="form-select" name="genre"><option value="">Любой жанр</option>
@@ -15,6 +16,7 @@
   <div class="col-12"><label class="small"><input type="checkbox" name="exp" value="1" {% if with_expansions %}checked{% endif %}>
     показывать дополнения</label></div>
 </form>
+{% endif %}
 
 {% if recommended %}
 <div class="mb-4">

@@ -29,13 +29,14 @@
           <span class="badge rounded-pill text-bg-warning" title="Проходки">🎟 {{ user.profile.passes }}</span>
         </a>
         <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="btn btn-sm btn-link text-light">Выйти</button></form>
-      {% else %}
+      {% elif not DEMO %}
         <a class="btn btn-sm btn-warning" href="{% url 'accounts:login' %}">Войти</a>
       {% endif %}
     </div>
   </nav>
 </header>
 
+{% if DEMO %}<div class="demo-bar">Демо-версия: можно посмотреть оформление, карту, каталог и мероприятия. Вход, бронь, аренда и оплата работают в полной версии сайта.</div>{% endif %}
 <main class="container py-4">
   {% for m in messages %}
     <div class="alert alert-{% if m.tags == 'error' %}danger{% else %}{{ m.tags }}{% endif %} alert-dismissible fade show">{{ m }}

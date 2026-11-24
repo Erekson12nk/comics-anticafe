@@ -128,12 +128,15 @@
           <select name="purpose" class="form-select">{% for v, l in purposes %}<option value="{{ v }}">{{ l }}</option>{% endfor %}</select></div>
         <div class="col-12"><input name="comment" class="form-control" placeholder="Комментарий для администратора"></div>
       </div>
+      {% elif DEMO %}
+        <p>Это демо-версия сайта: бронирование и оплата работают в полной версии.</p>
       {% else %}
         <p>Чтобы забронировать комнату, войдите на сайт.</p>
       {% endif %}
     </div>
     <div class="modal-footer">
       {% if user.is_authenticated %}<button class="btn btn-primary">Забронировать и оплатить</button>
+      {% elif DEMO %}<button type="button" class="btn btn-light" data-bs-dismiss="modal">Понятно</button>
       {% else %}<a class="btn btn-primary" href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}">Войти</a>{% endif %}
     </div>
   </form></div>
@@ -150,7 +153,7 @@
     document.querySelectorAll('.room').forEach(room => room.addEventListener('click', () => {
       document.getElementById('bmName').textContent = room.dataset.name;
       document.getElementById('bmPrice').textContent = room.dataset.price;
-      document.getElementById('bookForm').action = `/room/${room.dataset.room}/book/`;
+      document.getElementById('bookForm').action = `{% url 'booking:map' %}room/${room.dataset.room}/book/`;
       modal.show();
     }));
   }
