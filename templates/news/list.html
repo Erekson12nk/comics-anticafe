@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Новости и статистика{% endblock %}
+{% block content %}
+<h1 class="page-title">Новости и статистика</h1>
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="d-flex gap-2 mb-3 flex-wrap">
+      <a class="btn btn-sm {% if not kind %}btn-primary{% else %}btn-light{% endif %}" href="?">Все</a>
+      {% for v, l in kinds %}<a class="btn btn-sm {% if kind == v %}btn-primary{% else %}btn-light{% endif %}" href="?kind={{ v }}">{{ l }}</a>{% endfor %}
+    </div>
+    {% for n in items %}
+      <article class="card p-3 mb-3 lift">
+        <div class="small text-muted">{{ n.created|date:"j E Y" }} · <span class="pill">{{ n.get_kind_display }}</span></div>
+        <h4 class="mt-1">{{ n.title }}</h4>
+        {% if n.image %}<img src="{{ n.image.url }}" class="w-100 rounded-3 mb-2" alt="">{% endif %}
+        <div>{{ n.text|linebreaksbr }}</div>
+      </article>
+    {% empty %}<p class="text-muted">Новостей пока нет.</p>{% endfor %}
+  </div>
+  <div class="col-lg-5">
+    {% if big_events %}
+    <div class="card p-3 mb-3">
+      <h5>🔥 Скоро</h5>
+      {% for e in big_events %}<div class="mb-2"><span class="fs-4">{{ e.icon }}</span> <b>{{ e.title }}</b> — {{ e.start|date:"j E, H:i" }}</div>{% endfor %}
+      <a href="{% url 'booking:events' %}">Все ивенты →</a>
+    </div>
+    {% endif %}
+    <div class="card p-3">
+      <h5>Самые популярные игры</h5>
+      <canvas id="topChart" height="360"></canvas>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+  const data = {{ chart_json|safe }};
+  new Chart(document.getElementById('topChart'), {
+    type: 'bar',
+    data: {labels: data.labels, datasets: [
+      {label: 'Всего партий', data: data.total, backgroundColor: '#2b7de9', borderColor: '#141414', borderWidth: 2},
+      {label: 'В этом месяце', data: data.month, backgroundColor: '#ffd23f', borderColor: '#141414', borderWidth: 2}]},
+    options: {indexAxis: 'y', plugins: {legend: {position: 'bottom'}}, font: {family: 'Rubik'}}
+  });
+</script>
+{% endblock %}

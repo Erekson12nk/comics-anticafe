@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Консоли{% endblock %}
+{% block content %}
+<h1 class="page-title">Консоли и игры к ним</h1>
+<ul class="nav nav-pills mb-3">
+  {% for code, label, items in sections %}
+  <li class="nav-item"><button class="nav-link {% if forloop.first %}active{% endif %}" data-bs-toggle="pill" data-bs-target="#s-{{ code }}">{{ label }}</button></li>
+  {% endfor %}
+</ul>
+<div class="tab-content">
+{% for code, label, items in sections %}
+  <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="s-{{ code }}">
+    {% for c in items %}
+    <div class="card p-3 mb-3">
+      <div class="d-flex gap-3 align-items-start">
+        {% if c.image_url %}<img src="{{ c.image_url }}" alt="" style="width:120px" class="rounded">{% else %}<span style="font-size:3rem">🕹️</span>{% endif %}
+        <div><h4 class="mb-1">{{ c.name }}</h4><p class="text-muted mb-2">{{ c.description }}</p></div>
+      </div>
+      <div class="row g-2">
+        {% for g in c.games.all %}
+        <div class="col-md-6"><div class="border rounded-3 p-2 h-100"><b>{{ g.title }}</b> <span class="pill">{{ g.genre }}</span>
+          <div class="small">{{ g.review }}</div></div></div>
+        {% empty %}<div class="text-muted">Список игр скоро появится.</div>{% endfor %}
+      </div>
+    </div>
+    {% empty %}<p class="text-muted">В этом разделе пока пусто.</p>{% endfor %}
+  </div>
+{% endfor %}
+</div>
+{% endblock %}

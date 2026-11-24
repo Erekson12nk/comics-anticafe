@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Профиль{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card p-3 text-center">
+      {% if prof.avatar_src %}<img src="{{ prof.avatar_src }}" class="rounded-circle mx-auto mb-2" style="width:120px;height:120px;object-fit:cover" alt="">
+      {% else %}<span class="ava-letter mx-auto mb-2" style="width:120px;height:120px;font-size:3rem">{{ user.username|first|upper }}</span>{% endif %}
+      <h3 class="mb-0">{{ prof.display_name }}</h3>
+      <div class="fs-2 my-2">🎟 {{ prof.passes }} <span class="fs-6 text-muted">проходок</span></div>
+      <form method="post" action="{% url 'booking:buy_passes' %}" class="d-flex gap-2">{% csrf_token %}
+        <input type="number" name="quantity" value="1" min="1" max="20" class="form-control">
+        <button class="btn btn-warning text-nowrap">Купить по {{ PASS_PRICE }} ₽</button>
+      </form>
+    </div>
+    <div class="card p-3 mt-3">
+      <h5>Мои данные</h5>
+      <form method="post" enctype="multipart/form-data">{% csrf_token %}
+        <input class="form-control mb-2" name="first_name" value="{{ form.first_name.value|default:'' }}" placeholder="Имя">
+        <input class="form-control mb-2" name="phone" value="{{ form.phone.value|default:'' }}" placeholder="Телефон">
+        <input class="form-control mb-2" type="file" name="avatar" accept="image/*">
+        <button class="btn btn-outline-primary w-100">Сохранить</button>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <h4>Достижения</h4>
+    <div class="row g-2 mb-4">
+      {% for a in achievements %}
+        <div class="col-6 col-md-3"><div class="ach {% if a.pk not in my_achievements %}locked{% endif %}" title="{{ a.description }}">
+          <div class="icon">{{ a.icon }}</div><div class="small fw-bold">{{ a.title }}</div></div></div>
+      {% endfor %}
+    </div>
+
+    <h4>Мои планы</h4>
+    <div class="card p-3 mb-3">
+      {% for v in visits %}<div>📅 {{ v.date|date:"j E" }}{% if v.game %} — хочу в «{{ v.game }}»{% endif %}{% if v.comment %}, «{{ v.comment }}»{% endif %}</div>
+      {% empty %}<span class="text-muted">Отметьте дату прихода на <a href="{% url 'booking:map' %}">карте</a>.</span>{% endfor %}
+      {% for b in bookings %}<div>🚪 {{ b.room }} — {{ b.start|date:"j E H:i" }}–{{ b.end|time:"H:i" }} · {{ b.get_status_display }}</div>{% endfor %}
+      {% for e in events %}<div>{{ e.icon }} {{ e.title }} — {{ e.start|date:"j E H:i" }}</div>{% endfor %}
+    </div>
+
+    <h4>Избранные настолки</h4>
+    <div class="d-flex flex-wrap gap-2 mb-4">
+      {% for g in favorites %}<a class="pill" href="{{ g.get_absolute_url }}">❤️ {{ g.title }}</a>
+      {% empty %}<span class="text-muted">Нажмите 🤍 в каталоге, чтобы добавить игру.</span>{% endfor %}
+    </div>
+
+    <h4>Аренда игр</h4>
+    <table class="table table-sm bg-white">
+      <tr><th>Игра</th><th>Даты</th><th>Способ</th><th>Сумма</th><th>Статус</th></tr>
+      {% for r in rentals %}
+        <tr><td>{{ r.game }}</td><td>{{ r.date_from|date:"d.m" }}–{{ r.date_to|date:"d.m" }}</td><td>{{ r.get_method_display }}</td>
+          <td>{{ r.amount|floatformat:0 }} ₽ {% if r.paid %}✅{% endif %}</td><td>{{ r.get_status_display }}</td></tr>
+      {% empty %}<tr><td colspan="5" class="text-muted">Пока не было</td></tr>{% endfor %}
+    </table>
+  </div>
+</div>
+{% endblock %}

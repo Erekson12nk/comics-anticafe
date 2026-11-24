@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Регистрация{% endblock %}
+{% block content %}
+<div class="card p-4 mx-auto" style="max-width: 460px">
+  <h1 class="page-title h3 mb-3">Регистрация</h1>
+  <form method="post">{% csrf_token %}
+    {% for f in form %}
+      <div class="mb-2"><label class="form-label small">{{ f.label }}</label>
+        <input class="form-control" type="{% if 'password' in f.name %}password{% else %}text{% endif %}" name="{{ f.html_name }}" value="{{ f.value|default:'' }}" required>
+        {% for e in f.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</div>
+    {% endfor %}
+    <button class="btn btn-primary w-100 mt-2">Создать аккаунт</button>
+  </form>
+</div>
+{% endblock %}

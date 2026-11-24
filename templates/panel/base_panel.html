@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex flex-wrap gap-2 mb-3">
+  {% with n=request.resolver_match.url_name %}
+  <a class="btn btn-sm {% if n == 'dashboard' %}btn-primary{% else %}btn-light{% endif %}" href="{% url 'panel:dashboard' %}">Сводка</a>
+  <a class="btn btn-sm {% if n == 'rentals' %}btn-primary{% else %}btn-light{% endif %}" href="{% url 'panel:rentals' %}">Таблица аренд</a>
+  <a class="btn btn-sm {% if n == 'income' %}btn-primary{% else %}btn-light{% endif %}" href="{% url 'panel:income' %}">Калькулятор доходности</a>
+  <a class="btn btn-sm {% if n == 'plays' %}btn-primary{% else %}btn-light{% endif %}" href="{% url 'panel:plays' %}">Счетчик партий</a>
+  <a class="btn btn-sm {% if n == 'map_edit' %}btn-primary{% else %}btn-light{% endif %}" href="{% url 'panel:map_edit' %}">Редактор карты</a>
+  <a class="btn btn-sm btn-outline-dark" href="{% url 'admin:index' %}">Каталоги, ивенты, новости (админка) →</a>
+  {% endwith %}
+</div>
+{% block panel %}{% endblock %}
+{% endblock %}

@@ -1,0 +1,153 @@
+/* Общий стиль сайта Com!cs — в духе комиксов: черный контур, жесткие тени, точки печати.
+   Цвета и толщина контура меняются в переменных ниже. */
+:root {
+  --ink: #141414;          /* контур и текст */
+  --paper: #fff7e0;        /* фон страницы — пожелтевшая бумага */
+  --yellow: #ffd23f;
+  --red: #ef3e36;
+  --blue: #2b7de9;
+  --green: #3bb273;
+  --pink: #ff6fb5;
+  --muted: #5c5546;
+  --line: 3px;             /* толщина контура */
+  --shadow: 5px 5px 0 var(--ink);
+  --font-head: "Rubik Mono One", "Rubik", sans-serif;
+  --font-hand: "Pangolin", "Comic Sans MS", cursive;
+}
+
+body {
+  font-family: "Rubik", system-ui, sans-serif; color: var(--ink);
+  background-color: var(--paper);
+  /* точки как в старой типографской печати */
+  background-image: radial-gradient(rgba(20, 20, 20, .09) 1.3px, transparent 1.4px);
+  background-size: 14px 14px;
+}
+a { color: var(--blue); font-weight: 500; }
+h1, h2, h3, h4, h5, .comic-font { font-family: var(--font-head); font-weight: 400; letter-spacing: .5px; }
+h5, h6 { font-size: 1rem; }
+.text-muted { color: var(--muted) !important; }
+
+/* Верхняя горизонтальная панель */
+.topbar { background: var(--yellow); border-bottom: var(--line) solid var(--ink); padding: .55rem 0;
+  position: sticky; top: 0; z-index: 50; box-shadow: 0 4px 0 var(--ink); }
+.logo { font-family: var(--font-head); font-size: 1.75rem; color: var(--red); text-decoration: none; line-height: 1;
+  -webkit-text-stroke: 1.5px var(--ink); text-shadow: 3px 3px 0 var(--ink); transform: rotate(-3deg); display: inline-block; }
+.logo:hover { color: var(--red); transform: rotate(-3deg) scale(1.05); }
+.logo span { color: var(--blue); display: inline-block; transform: rotate(14deg) translateY(-2px); }
+.nav-main a { color: var(--ink); text-decoration: none; padding: .35rem .8rem; font-weight: 700; border: 2px solid transparent;
+  border-radius: 4px; transition: transform .12s; }
+.nav-main a:hover { background: #fff; border-color: var(--ink); transform: rotate(-1.5deg); }
+.nav-main a.active { background: var(--red); color: #fff; border-color: var(--ink); box-shadow: 3px 3px 0 var(--ink); transform: rotate(-1.5deg); }
+.nav-main a.staff { border: 2px dashed var(--ink); }
+.profile-chip { display: flex; align-items: center; gap: .5rem; color: var(--ink); text-decoration: none; padding: .15rem .6rem .15rem .15rem;
+  border: 2px solid var(--ink); border-radius: 999px; background: #fff; box-shadow: 3px 3px 0 var(--ink); font-weight: 700; }
+.profile-chip:hover { color: var(--ink); transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.profile-chip img, .ava-letter { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--ink); }
+.ava-letter { display: inline-flex; align-items: center; justify-content: center; background: var(--pink); font-weight: 700; color: #fff; }
+.topbar .btn-link { color: var(--ink) !important; font-weight: 700; }
+
+/* Заголовок страницы — плашка рассказчика из комикса */
+.page-title { display: inline-block; font-family: var(--font-head); font-size: clamp(1.3rem, 3.5vw, 2rem); text-transform: uppercase;
+  background: var(--yellow); border: var(--line) solid var(--ink); box-shadow: var(--shadow); padding: .35rem 1rem;
+  transform: rotate(-1deg); margin-bottom: 1.2rem; }
+
+/* Карточки — панели комикса */
+.card { background: #fff; border: var(--line) solid var(--ink); border-radius: 6px; box-shadow: var(--shadow); }
+.card-header { background: var(--yellow); border-bottom: var(--line) solid var(--ink); font-weight: 700; }
+.lift { transition: transform .12s, box-shadow .12s; }
+.lift:hover { transform: translate(-3px, -3px) rotate(-.6deg); box-shadow: 9px 9px 0 var(--ink); }
+
+/* Подписи-«облачка» */
+.pill { display: inline-block; padding: .15rem .65rem; border: 2px solid var(--ink); border-radius: 999px; background: #fff;
+  color: var(--ink); font-family: var(--font-hand); font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink); }
+a.pill:hover { background: var(--yellow); color: var(--ink); }
+.genre-tag { display: inline-block; background: var(--blue); color: #fff; border: 2px solid var(--ink); padding: 0 .45rem;
+  font-size: .75rem; font-weight: 700; text-transform: uppercase; transform: rotate(-2deg); }
+
+/* Цена — «взрыв» POW */
+.price-tag { position: relative; display: inline-block; font-family: var(--font-head); font-size: .8rem; color: var(--ink);
+  padding: .75em 1.35em; background: var(--yellow); white-space: nowrap;
+  clip-path: polygon(50% 0, 61% 18%, 82% 6%, 78% 30%, 100% 34%, 84% 52%, 98% 72%, 75% 72%, 72% 96%, 55% 80%, 38% 100%,
+    32% 78%, 8% 88%, 16% 64%, 0 50%, 18% 36%, 6% 14%, 30% 20%, 38% 0); }
+.burst { display: inline-block; font-family: var(--font-head); color: #fff; background: var(--red); padding: 1.2rem 1.4rem;
+  clip-path: polygon(50% 0, 61% 18%, 82% 6%, 78% 30%, 100% 34%, 84% 52%, 98% 72%, 75% 72%, 72% 96%, 55% 80%, 38% 100%,
+    32% 78%, 8% 88%, 16% 64%, 0 50%, 18% 36%, 6% 14%, 30% 20%, 38% 0); }
+
+/* Кнопки и поля ввода */
+.btn { border: 2px solid var(--ink) !important; border-radius: 4px; font-weight: 700; box-shadow: 3px 3px 0 var(--ink);
+  transition: transform .08s, box-shadow .08s; }
+.btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink) !important; }
+.btn-link, .btn-close { border: 0 !important; box-shadow: none !important; }
+.btn-primary { background: var(--red); color: #fff; }
+.btn-primary:hover, .btn-primary:focus { background: #d42e27; color: #fff; }
+.btn-warning { background: var(--yellow); color: var(--ink); }
+.btn-success { background: var(--green); }
+.btn-outline-primary, .btn-outline-secondary, .btn-outline-danger, .btn-light { background: #fff; color: var(--ink); }
+.btn-outline-primary:hover, .btn-outline-secondary:hover, .btn-light:hover { background: var(--yellow); color: var(--ink); }
+.form-control, .form-select { border: 2px solid var(--ink); border-radius: 4px; }
+.form-control:focus, .form-select:focus { border-color: var(--ink); box-shadow: 3px 3px 0 var(--blue); }
+.form-label { font-weight: 700; }
+
+/* Сообщения — облачко реплики с хвостиком */
+.alert { position: relative; border: var(--line) solid var(--ink); border-radius: 18px; box-shadow: var(--shadow);
+  font-family: var(--font-hand); font-size: 1.1rem; color: var(--ink); background: #fff; margin-bottom: 1.8rem; }
+.alert::after { content: ""; position: absolute; left: 36px; bottom: -18px; width: 26px; height: 18px; background: var(--ink);
+  clip-path: polygon(0 0, 100% 0, 10% 100%); }
+.alert-success { background: #e2f7e9; } .alert-danger { background: #ffe1df; } .alert-warning { background: #fff3c4; } .alert-info { background: #e1eeff; }
+.badge { border: 2px solid var(--ink); }
+
+/* Карточки игр */
+.game-img { height: 190px; object-fit: contain; padding: .4rem; background-color: #fff; border-bottom: var(--line) solid var(--ink); border-radius: 3px 3px 0 0;
+  display: block; }
+.game-img.placeholder-img { background: repeating-linear-gradient(45deg, #ffe78a 0 12px, #ffd23f 12px 24px); }
+.game-img.placeholder-img { display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+.game-title { font-weight: 800; color: var(--ink); text-decoration: none; line-height: 1.2; }
+.game-title:hover { color: var(--red); }
+.fav-btn { border: 0; background: none; font-size: 1.3rem; line-height: 1; }
+.pagination .page-link { border: 2px solid var(--ink); color: var(--ink); font-weight: 700; margin: 0 2px; border-radius: 4px !important; }
+.pagination .active .page-link { background: var(--red); border-color: var(--ink); color: #fff; }
+
+/* Карта заведения */
+.day-strip { display: flex; gap: .45rem; overflow-x: auto; padding: .2rem .2rem .55rem; }
+.day-strip a { flex: 0 0 auto; text-align: center; padding: .3rem .7rem; background: #fff; text-decoration: none; color: var(--ink);
+  border: 2px solid var(--ink); border-radius: 4px; box-shadow: 3px 3px 0 var(--ink); font-size: .9rem; }
+.day-strip a:hover { background: var(--yellow); }
+.day-strip a.active { background: var(--blue); color: #fff; transform: rotate(-2deg); }
+.guests { display: flex; flex-wrap: wrap; gap: .5rem; min-height: 48px; align-items: center; }
+.guest { position: relative; }
+.guest img, .guest .ava-letter { width: 44px; height: 44px; border: var(--line) solid var(--ink); border-radius: 50%; box-shadow: 2px 2px 0 var(--ink); }
+.guest:hover img, .guest:hover .ava-letter { transform: scale(1.12) rotate(-4deg); transition: .15s; }
+.map-wrap { background: #fff; border: var(--line) solid var(--ink); border-radius: 6px; padding: 1rem; box-shadow: var(--shadow); }
+.map-svg { width: 100%; height: auto; display: block; }
+.map-svg .room { cursor: pointer; }
+.map-svg .room rect.body { stroke: var(--ink); stroke-width: 4; }
+.map-svg .room:hover rect.body { filter: brightness(1.12); }
+.map-svg text { font-family: "Rubik", sans-serif; font-weight: 700; pointer-events: none; }
+
+/* «Ошибочка» — когда листают дальше двух недель */
+.oops { text-align: center; padding: 4rem 1rem; }
+.oops h2 { font-family: var(--font-head); font-size: clamp(1.4rem, 4vw, 2.4rem); animation: shake .35s infinite; display: inline-block;
+  color: #fff; background: var(--red); border: var(--line) solid var(--ink); box-shadow: var(--shadow); padding: .8rem 1.4rem; }
+@keyframes shake {
+  0% { transform: translate(0, 0) rotate(0); } 25% { transform: translate(-3px, 1px) rotate(-1.5deg); }
+  50% { transform: translate(2px, -2px) rotate(1deg); } 75% { transform: translate(-1px, 2px) rotate(-.5deg); }
+  100% { transform: translate(0, 0) rotate(0); }
+}
+
+.event-card { border-left-width: 12px; border-left-color: var(--red); }
+.ach { text-align: center; padding: .6rem; border: 2px solid var(--ink); border-radius: 6px; background: #fff; box-shadow: 3px 3px 0 var(--ink); }
+.ach.locked { filter: grayscale(1); opacity: .45; }
+.ach .icon { font-size: 2rem; }
+
+/* Таблицы панели */
+table.table { border: var(--line) solid var(--ink); background: #fff; }
+table.table th { background: var(--yellow); border-bottom: var(--line) solid var(--ink); }
+table.table td, table.table th { vertical-align: middle; border-color: var(--ink); }
+.late { background: #ffd6d3 !important; }
+.list-group-item { border: 2px solid var(--ink); }
+
+.footer { background: var(--ink); color: #f3ead0; padding: 1.2rem 0; margin-top: 3rem;
+  border-top: 6px solid var(--yellow); font-family: var(--font-hand); font-size: 1.05rem; }
+.price-box { display: inline-block; font-family: var(--font-head); background: var(--yellow); border: var(--line) solid var(--ink);
+  box-shadow: var(--shadow); padding: .4rem .9rem; transform: rotate(-2deg); }

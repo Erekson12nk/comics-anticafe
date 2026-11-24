@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Календарь ивентов{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-end mb-3">
+  <h1 class="page-title mb-3">Календарь ивентов</h1>
+  <a class="btn btn-outline-primary" href="{% url 'booking:map' %}">← К карте</a>
+</div>
+<div class="row g-3">
+{% for e in events %}
+  <div class="col-md-6 col-lg-4">
+    <div class="card event-card lift h-100 p-3" style="border-left-color: {{ e.template.color|default:'#facc15' }}">
+      <div class="d-flex gap-2 align-items-start">
+        <span class="fs-1">{{ e.icon }}</span>
+        <div>
+          <h5 class="mb-1">{{ e.title }} {% if e.is_big %}<span class="pill">масштабное</span>{% endif %}</h5>
+          <div class="text-muted small">{{ e.start|date:"l, j E" }} · {{ e.start|time:"H:i" }}–{{ e.end|time:"H:i" }} · {{ e.room|default:"всё заведение" }}</div>
+        </div>
+      </div>
+      {% if e.description %}<p class="mt-2 mb-2">{{ e.description|linebreaksbr }}</p>{% endif %}
+      {% if e.game %}<p class="mb-2">🎲 Играем в <a href="{{ e.game.get_absolute_url }}">{{ e.game.title }}</a></p>{% endif %}
+      <div class="mt-auto d-flex justify-content-between align-items-center">
+        <span class="small">Свободно мест: <b>{{ e.free_seats }}</b> из {{ e.seats }}</span>
+        {% if user.is_authenticated %}
+          <form method="post" action="{% url 'booking:toggle_event' e.pk %}">{% csrf_token %}
+            {% if user in e.participants.all %}<button class="btn btn-sm btn-outline-secondary">Отписаться</button>
+            {% else %}<button class="btn btn-sm btn-primary" {% if not e.free_seats %}disabled{% endif %}>Записаться</button>{% endif %}
+          </form>
+        {% else %}<a class="btn btn-sm btn-primary" href="{% url 'accounts:login' %}">Войти и записаться</a>{% endif %}
+      </div>
+    </div>
+  </div>
+{% empty %}
+  <p class="text-muted">Ближайших мероприятий пока нет — следите за новостями!</p>
+{% endfor %}
+</div>
+{% endblock %}

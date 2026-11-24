@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Оплата{% endblock %}
+{% block content %}
+<div class="card p-4 mx-auto" style="max-width: 520px">
+  <h1 class="page-title h3">Оплата</h1>
+  <p class="mb-1">{{ payment.get_kind_display }}{% if payment.quantity %} × {{ payment.quantity }}{% endif %}</p>
+  {% if payment.booking %}<p class="text-muted small mb-1">{{ payment.booking.room }}, {{ payment.booking.start|date:"j E H:i" }}–{{ payment.booking.end|time:"H:i" }}</p>{% endif %}
+  {% if payment.rental %}<p class="text-muted small mb-1">{{ payment.rental.game }}, {{ payment.rental.date_from|date:"j E" }} – {{ payment.rental.date_to|date:"j E" }} ({{ payment.rental.get_method_display|lower }})</p>{% endif %}
+  <p class="fs-3 price-tag">{{ payment.amount|floatformat:0 }} ₽</p>
+  {% if done %}
+    <div class="alert alert-success">Оплачено! Спасибо 🎉</div>
+    <a class="btn btn-primary" href="{% url 'accounts:profile' %}">В профиль</a>
+  {% else %}
+    <form method="post">{% csrf_token %}
+      <button class="btn btn-primary btn-lg w-100">{% if demo %}Оплатить (демо){% else %}Перейти к оплате ЮKassa{% endif %}</button>
+    </form>
+    {% if demo %}<p class="small text-muted mt-2">Ключи ЮKassa не настроены, поэтому оплата работает в демо-режиме: деньги не списываются.</p>{% endif %}
+  {% endif %}
+</div>
+{% endblock %}

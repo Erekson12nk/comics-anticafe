@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}Бронь и ивенты{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-3">
+  <div>
+    <h1 class="page-title mb-3">Карта заведения</h1>
+    <div class="text-muted">Нажмите на комнату, чтобы забронировать ее</div>
+  </div>
+  <a class="btn btn-outline-primary" href="{% url 'booking:events' %}">Календарь ивентов →</a>
+</div>
+
+<div class="d-flex align-items-center gap-2 mb-3">
+  {% if day > today %}<a class="btn btn-sm btn-light" href="?d={{ prev_day|date:'Y-m-d' }}">←</a>{% endif %}
+  <div class="day-strip flex-grow-1">
+    {% for d in days %}
+      <a href="?d={{ d|date:'Y-m-d' }}" class="{% if d == day %}active{% endif %}">
+        <div class="small">{{ d|date:"D" }}</div><b>{{ d|date:"j" }}</b> <span class="small">{{ d|date:"M" }}</span>
+      </a>
+    {% endfor %}
+  </div>
+  <a class="btn btn-sm btn-light" href="?d={{ next_day|date:'Y-m-d' }}">→</a>
+</div>
+
+{% if too_far %}
+  <div class="oops">
+    <h2>Ошибочка — нестабильное время!</h2>
+    <p class="lead mt-3">Мы не оракулы, чтобы загадывать дальше чем на две недели 🔮</p>
+    <a class="btn btn-primary" href="?d={{ today|date:'Y-m-d' }}">Вернуться к сегодняшнему дню</a>
+  </div>
+{% else %}
+
+<div class="card p-3 mb-3">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <div>
+      <b>Кто придет {{ day|date:"j E" }}</b>
+      <span class="text-muted small">— наведите на аватарку, чтобы увидеть, во что человек хочет поиграть</span>
+    </div>
+    {% if user.is_authenticated %}
+      <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#visitForm">
+        {% if my_visit %}Изменить мою отметку{% else %}Я тоже приду!{% endif %}</button>
+    {% endif %}
+  </div>
+  <div class="guests mt-2">
+    {% for v in visits %}
+      <span class="guest" data-bs-toggle="tooltip" data-bs-html="true"
+            title="<b>{{ v.user.profile.display_name }}</b>{% if v.game %}<br>🎲 {{ v.game.title }}{% endif %}{% if v.comment %}<br>«{{ v.comment }}»{% endif %}">
+        {% if v.user.profile.avatar_src %}<img src="{{ v.user.profile.avatar_src }}" alt="">{% else %}<span class="ava-letter">{{ v.user.username|first|upper }}</span>{% endif %}
+      </span>
+    {% empty %}
+      <span class="text-muted">Пока никто не отметился. Станьте первым — и найдите компанию на игру!</span>
+    {% endfor %}
+  </div>
+  {% if user.is_authenticated %}
+  <form id="visitForm" class="collapse mt-3 row g-2" method="post" action="{% url 'booking:plan_visit' %}">
+    {% csrf_token %}<input type="hidden" name="date" value="{{ day|date:'Y-m-d' }}">
+    <div class="col-md-4"><select name="game" class="form-select">
+      <option value="">Во что хочу поиграть (необязательно)</option>
+      {% for g in games %}<option value="{{ g.pk }}" {% if my_visit.game_id == g.pk %}selected{% endif %}>{{ g.title }}</option>{% endfor %}
+    </select></div>
+    <div class="col-md-5"><input name="comment" class="form-control" maxlength="150" placeholder="Комментарий: «ищу двоих на Каркассон после 18:00»" value="{{ my_visit.comment|default:'' }}"></div>
+    <div class="col-md-3 d-flex gap-2"><button class="btn btn-primary flex-grow-1">Отметиться</button>
+      {% if my_visit %}<button class="btn btn-outline-danger" name="remove" value="1">Убрать</button>{% endif %}</div>
+  </form>
+  {% endif %}
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-9">
+    <div class="map-wrap">
+      <svg class="map-svg" viewBox="0 0 1000 600" role="img" aria-label="Карта заведения">
+        <rect x="0" y="0" width="1000" height="600" rx="6" fill="#fff7e0"/>
+        {% for r in rooms %}
+        <g class="room" data-room="{{ r.pk }}" data-name="{{ r.name }}" data-price="{{ r.price_hour|floatformat:0 }}" data-cap="{{ r.capacity }}">
+          <rect class="body" x="{{ r.x }}" y="{{ r.y }}" width="{{ r.width }}" height="{{ r.height }}" rx="4"
+                fill="{{ r.color }}" fill-opacity=".35"/>
+          <text x="{{ r.x|add:12 }}" y="{{ r.y|add:28 }}" font-size="20" font-weight="700" fill="#141414">{{ r.name }}</text>
+          <text x="{{ r.x|add:12 }}" y="{{ r.y|add:50 }}" font-size="13" fill="#3d3729">{{ r.kind }} · до {{ r.capacity }} чел. · {{ r.price_hour|floatformat:0 }} ₽/ч</text>
+          {% for e, y in r.event_rows %}
+            {% if e.picture %}
+              <image href="{{ e.picture }}" x="{{ r.x|add:12 }}" y="{{ y }}" width="54" height="54" preserveAspectRatio="xMidYMid slice"/>
+            {% else %}
+              <text x="{{ r.x|add:14 }}" y="{{ y|add:42 }}" font-size="40">{{ e.icon }}</text>
+            {% endif %}
+            <text x="{{ r.x|add:74 }}" y="{{ y|add:22 }}" font-size="15" font-weight="700" fill="#141414">{{ e.title|truncatechars:22 }}</text>
+            <text x="{{ r.x|add:74 }}" y="{{ y|add:42 }}" font-size="13" fill="#2b7de9">{{ e.start|time:"H:i" }}–{{ e.end|time:"H:i" }}</text>
+          {% endfor %}
+          {% for text, y in r.busy_rows %}
+            <text x="{{ r.x|add:12 }}" y="{{ y }}" font-size="13" fill="#ef3e36">{{ text }}</text>
+          {% endfor %}
+        </g>
+        {% endfor %}
+      </svg>
+    </div>
+  </div>
+  <div class="col-lg-3">
+    <div class="card p-3 mb-3">
+      <b class="mb-2">🎲 Настолки на вечер</b>
+      {% for g in evening_games %}<a href="{{ g.get_absolute_url }}" class="d-block">{{ g.title }}</a>
+      {% empty %}<span class="text-muted small">Пока ничего не запланировано</span>{% endfor %}
+    </div>
+    <div class="card p-3">
+      <b class="mb-2">⭐ Ивенты дня</b>
+      {% for e in events %}<div class="mb-2"><span class="fs-4">{{ e.icon }}</span> {{ e.title }}<br>
+        <span class="small text-muted">{{ e.start|time:"H:i" }} · {{ e.room|default:"всё заведение" }}</span></div>
+      {% empty %}<span class="text-muted small">В этот день ивентов нет</span>{% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="bookModal" tabindex="-1">
+  <div class="modal-dialog"><form class="modal-content" method="post" id="bookForm">
+    {% csrf_token %}
+    <div class="modal-header"><h5 class="modal-title">Бронь: <span id="bmName"></span></h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      {% if user.is_authenticated %}
+      <input type="hidden" name="date" value="{{ day|date:'Y-m-d' }}">
+      <p class="text-muted mb-2">{{ day|date:"l, j E" }} · <span id="bmPrice"></span> ₽ в час</p>
+      <div class="row g-2">
+        <div class="col-6"><label class="form-label">Начало</label>
+          <select name="time" class="form-select">
+            <option>12:00</option><option>13:00</option><option>14:00</option><option>15:00</option><option>16:00</option>
+            <option>17:00</option><option selected>18:00</option><option>19:00</option><option>20:00</option><option>21:00</option>
+          </select></div>
+        <div class="col-6"><label class="form-label">Часов</label>
+          <input type="number" name="hours" class="form-control" value="2" min="1" max="12"></div>
+        <div class="col-12"><label class="form-label">Зачем</label>
+          <select name="purpose" class="form-select">{% for v, l in purposes %}<option value="{{ v }}">{{ l }}</option>{% endfor %}</select></div>
+        <div class="col-12"><input name="comment" class="form-control" placeholder="Комментарий для администратора"></div>
+      </div>
+      {% else %}
+        <p>Чтобы забронировать комнату, войдите на сайт.</p>
+      {% endif %}
+    </div>
+    <div class="modal-footer">
+      {% if user.is_authenticated %}<button class="btn btn-primary">Забронировать и оплатить</button>
+      {% else %}<a class="btn btn-primary" href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}">Войти</a>{% endif %}
+    </div>
+  </form></div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));
+  const modalEl = document.getElementById('bookModal');
+  if (modalEl) {
+    const modal = new bootstrap.Modal(modalEl);
+    document.querySelectorAll('.room').forEach(room => room.addEventListener('click', () => {
+      document.getElementById('bmName').textContent = room.dataset.name;
+      document.getElementById('bmPrice').textContent = room.dataset.price;
+      document.getElementById('bookForm').action = `/room/${room.dataset.room}/book/`;
+      modal.show();
+    }));
+  }
+</script>
+{% endblock %}

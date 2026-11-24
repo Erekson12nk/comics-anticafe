@@ -1,0 +1,18 @@
+{% extends "panel/base_panel.html" %}
+{% block title %}Панель администратора{% endblock %}
+{% block panel %}
+<h1 class="page-title">Панель администратора</h1>
+<div class="row g-3 mb-4">
+  <div class="col-md-4"><div class="card p-3"><div class="text-muted">Броней сегодня</div><div class="fs-2 fw-bold">{{ bookings_today|length }}</div></div></div>
+  <div class="col-md-4"><div class="card p-3"><div class="text-muted">Открытых аренд</div><div class="fs-2 fw-bold">{{ rentals_open }}</div></div></div>
+  <div class="col-md-4"><div class="card p-3 {% if rentals_late %}late{% endif %}"><div class="text-muted">Просрочено возвратов</div><div class="fs-2 fw-bold">{{ rentals_late }}</div></div></div>
+</div>
+<h4>Брони на сегодня</h4>
+<table class="table bg-white">
+  <tr><th>Комната</th><th>Время</th><th>Гость</th><th>Цель</th><th>Статус</th></tr>
+  {% for b in bookings_today %}
+    <tr><td>{{ b.room }}</td><td>{{ b.start|time:"H:i" }}–{{ b.end|time:"H:i" }}</td><td>{{ b.user.profile.display_name }}</td>
+      <td>{{ b.get_purpose_display }}{% if b.comment %} · {{ b.comment }}{% endif %}</td><td>{{ b.get_status_display }}</td></tr>
+  {% empty %}<tr><td colspan="5" class="text-muted">Сегодня броней нет</td></tr>{% endfor %}
+</table>
+{% endblock %}

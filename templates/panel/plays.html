@@ -1,0 +1,21 @@
+{% extends "panel/base_panel.html" %}
+{% block title %}Счетчик партий{% endblock %}
+{% block panel %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+  <div><h1 class="page-title mb-3">Счетчик партий</h1>
+    <div class="text-muted">Отмечайте каждую сыгранную партию. 1-го числа топ-15 уходит в новости, месячный счетчик обнуляется.</div></div>
+  <form method="post" action="{% url 'panel:publish_top' %}" onsubmit="return confirm('Опубликовать топ-15 и обнулить месячные счетчики?')">{% csrf_token %}
+    <button class="btn btn-warning">Опубликовать топ-15 сейчас</button></form>
+</div>
+<form class="mb-3" method="get"><input class="form-control" name="q" value="{{ q }}" placeholder="Найти игру"></form>
+<table class="table bg-white">
+  <tr><th>Игра</th><th>За месяц</th><th>Всего</th><th></th></tr>
+  {% for g in games %}
+  <tr><td>{{ g.title }}</td><td class="fw-bold">{{ g.plays_month }}</td><td>{{ g.plays_total }}</td>
+    <td><form method="post" action="{% url 'panel:play_count' g.pk %}" class="d-flex gap-1">{% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <button class="btn btn-sm btn-success" name="d" value="1">+1</button>
+      <button class="btn btn-sm btn-outline-secondary" name="d" value="-1">−1</button></form></td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Настольные игры{% endblock %}
+{% block content %}
+<h1 class="page-title">Каталог настольных игр</h1>
+<form class="card p-3 mb-4 row g-2 flex-row align-items-center" method="get">
+  <div class="col-md-4"><input class="form-control" name="q" value="{{ q }}" placeholder="Поиск по названию или описанию"></div>
+  <div class="col-md-2"><select class="form-select" name="genre"><option value="">Любой жанр</option>
+    {% for g in genres %}<option {% if g == genre %}selected{% endif %}>{{ g }}</option>{% endfor %}</select></div>
+  <div class="col-md-2"><input class="form-control" type="number" min="1" max="20" name="players" value="{{ players }}" placeholder="Игроков"></div>
+  <div class="col-md-2"><select class="form-select" name="sort">
+    <option value="title" {% if sort == 'title' %}selected{% endif %}>По названию</option>
+    <option value="popular" {% if sort == 'popular' %}selected{% endif %}>Популярные</option>
+    <option value="price" {% if sort == 'price' %}selected{% endif %}>Дешевле аренда</option></select></div>
+  <div class="col-md-2"><button class="btn btn-primary w-100">Найти!</button></div>
+  <div class="col-12"><label class="small"><input type="checkbox" name="exp" value="1" {% if with_expansions %}checked{% endif %}>
+    показывать дополнения</label></div>
+</form>
+
+{% if recommended %}
+<div class="mb-4">
+  <h5>Вам может понравиться</h5>
+  <div class="d-flex gap-2 flex-wrap">{% for g in recommended %}<a class="pill" href="{{ g.get_absolute_url }}">{{ g.title }}</a>{% endfor %}</div>
+</div>
+{% endif %}
+
+<p class="text-muted">Найдено игр: {{ total }}</p>
+<div class="row g-4">
+{% for g in games %}
+  <div class="col-sm-6 col-md-4 col-lg-3">
+    <div class="card h-100 lift">
+      <a href="{{ g.get_absolute_url }}">
+        {% if g.image_src %}<img class="game-img w-100" src="{{ g.image_src }}" alt="{{ g.title }}" loading="lazy">
+        {% else %}<div class="game-img placeholder-img">🎲</div>{% endif %}
+      </a>
+      <div class="card-body d-flex flex-column">
+        <div class="d-flex justify-content-between align-items-start gap-1">
+          <a class="game-title" href="{{ g.get_absolute_url }}">{{ g.title }}</a>
+          {% if user.is_authenticated %}
+          <form method="post" action="{% url 'games:favorite' g.pk %}">{% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button class="fav-btn" title="Избранное">{% if g.pk in favorites %}❤️{% else %}🤍{% endif %}</button></form>
+          {% endif %}
+        </div>
+        <div class="my-2"><span class="genre-tag">{{ g.genre }}</span></div>
+        <div class="small text-muted mb-2">👥 {{ g.players_text }} · ⏱ {{ g.play_time }} мин{% if g.age_min %} · {{ g.age_min }}+{% endif %}</div>
+        <div class="mt-auto d-flex justify-content-between align-items-center">
+          <span class="price-tag">{{ g.rent_price }} ₽/сут</span>
+          {% if g.n_reviews %}<span class="small">💬 {{ g.n_reviews }}</span>{% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% empty %}
+  <p>Ничего не нашлось. Попробуйте изменить фильтры.</p>
+{% endfor %}
+</div>
+
+{% if page.has_other_pages %}
+<nav class="mt-4"><ul class="pagination flex-wrap justify-content-center">
+  {% if page.has_previous %}<li class="page-item"><a class="page-link" href="?{{ query }}&page={{ page.previous_page_number }}">←</a></li>{% endif %}
+  {% for n in page.paginator.page_range %}
+    {% if n == page.number %}<li class="page-item active"><span class="page-link">{{ n }}</span></li>
+    {% elif n == 1 or n == page.paginator.num_pages %}<li class="page-item"><a class="page-link" href="?{{ query }}&page={{ n }}">{{ n }}</a></li>
+    {% elif n|add:"-2" <= page.number and n|add:"2" >= page.number %}<li class="page-item"><a class="page-link" href="?{{ query }}&page={{ n }}">{{ n }}</a></li>
+    {% elif n == 2 or n == page.paginator.num_pages|add:"-1" %}<li class="page-item disabled"><span class="page-link">…</span></li>{% endif %}
+  {% endfor %}
+  {% if page.has_next %}<li class="page-item"><a class="page-link" href="?{{ query }}&page={{ page.next_page_number }}">→</a></li>{% endif %}
+</ul></nav>
+{% endif %}
+{% endblock %}

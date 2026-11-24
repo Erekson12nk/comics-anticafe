@@ -1,0 +1,30 @@
+{% extends "panel/base_panel.html" %}
+{% block title %}Таблица аренд{% endblock %}
+{% block panel %}
+<h1 class="page-title">Таблица аренд</h1>
+<div class="d-flex gap-2 mb-3 flex-wrap">
+  <a class="btn btn-sm {% if not status %}btn-primary{% else %}btn-light{% endif %}" href="?">Все</a>
+  {% for v, l in statuses %}<a class="btn btn-sm {% if status == v %}btn-primary{% else %}btn-light{% endif %}" href="?status={{ v }}">{{ l }}</a>{% endfor %}
+</div>
+<div class="table-responsive">
+<table class="table table-sm bg-white">
+  <tr><th>Игра</th><th>Кто</th><th>Телефон</th><th>Способ</th><th>Взял</th><th>Вернуть до</th><th>Вернул</th><th>Вовремя</th><th>Сумма</th><th>Оплата</th><th>Статус</th><th></th></tr>
+  {% for r in rentals %}
+  <tr class="{% if r.status == 'issued' and r.date_to < today %}late{% endif %}">
+    <td>{{ r.game }}</td><td>{{ r.contact_name }}</td><td>{{ r.phone }}</td>
+    <td>{{ r.get_method_display }}{% if r.address %}<div class="small text-muted">{{ r.address }}</div>{% endif %}</td>
+    <td>{{ r.date_from|date:"d.m.y" }}</td><td>{{ r.date_to|date:"d.m.y" }}</td><td>{{ r.returned_at|date:"d.m.y"|default:"—" }}</td>
+    <td>{% with t=r.returned_on_time %}{% if t is None %}—{% elif t %}✅{% else %}❌{% endif %}{% endwith %}</td>
+    <td>{{ r.amount|floatformat:0 }} ₽</td><td>{% if r.paid %}✅{% else %}❌{% endif %}</td><td>{{ r.get_status_display }}</td>
+    <td><form method="post" action="{% url 'panel:rental_action' r.pk %}" class="d-flex gap-1">{% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      {% if r.status == 'new' %}<button class="btn btn-sm btn-outline-primary" name="action" value="issue">Выдать</button>{% endif %}
+      {% if r.status == 'issued' %}<button class="btn btn-sm btn-outline-success" name="action" value="return">Вернули</button>{% endif %}
+      {% if not r.paid %}<button class="btn btn-sm btn-outline-secondary" name="action" value="paid">Оплачено</button>{% endif %}
+      {% if r.status == 'new' %}<button class="btn btn-sm btn-outline-danger" name="action" value="cancel">✕</button>{% endif %}
+    </form></td>
+  </tr>
+  {% empty %}<tr><td colspan="12" class="text-muted">Аренд нет</td></tr>{% endfor %}
+</table>
+</div>
+{% endblock %}
